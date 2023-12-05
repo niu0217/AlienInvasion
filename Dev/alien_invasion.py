@@ -29,10 +29,10 @@ class AlienInvasion:
         self.stats = GameStats(self)
 
         self.ship = Ship(self)
-        self.bullets = pygame.sprite.Group()
-        self.aliens = pygame.sprite.Group()
+        self.bullets = pygame.sprite.Group()  # 子弹编组
+        self.aliens = pygame.sprite.Group()  # 外星人编组
 
-        self._create_fleet()
+        self._create_fleet()  # 创建一个外星人舰队
 
         # 游戏结束后出于活动状态
         self.game_active = True
@@ -40,11 +40,11 @@ class AlienInvasion:
     def run_game(self):
         """开始游戏的主循环"""
         while True:
-            self._check_events()
+            self._check_events()  # 响应按键和鼠标事件
             if self.game_active:
-                self.ship.update()
-                self._update_bullets()
-                self._update_aliens()
+                self.ship.update()  # 根据移动标志调整飞船的位置
+                self._update_bullets()  # 更新子弹的位置并删除已经消失的子弹
+                self._update_aliens()  # 检查是否有外星人位于屏幕边缘，并更新整个外星舰队的位置
 
             self._update_screen()
             self.clock.tick(60)  # 设置游戏的帧率
@@ -66,7 +66,7 @@ class AlienInvasion:
         elif event.key == pygame.K_LEFT:
             self.ship.moving_left = True
         elif event.key == pygame.K_SPACE:
-            self._fire_bullet()
+            self._fire_bullet()  # 创建一颗子弹，并将其加入编组bullets
 
     def _check_keyup_events(self, event):
         """响应释放"""
@@ -86,6 +86,7 @@ class AlienInvasion:
     def _update_bullets(self):
         """更新子弹的位置并删除已经消失的子弹"""
         # 更新子弹的位置
+        # 解释：在对编组调用update的时候，编组会自动对其中的每个精灵调用update
         self.bullets.update()
 
         # 删除已经消失的子弹
@@ -93,6 +94,7 @@ class AlienInvasion:
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
 
+        # 响应子弹和外星人的碰撞
         self._check_bullet_alien_collisions()
 
     def _check_bullet_alien_collisions(self):
@@ -103,13 +105,17 @@ class AlienInvasion:
             self.bullets, self.aliens, True, True
         )
 
+        # 如果没有外星人了
+        # 删除现有的子弹并创建一个新的外星舰队
         if not self.aliens:
-            # 删除现有的子弹并创建一个新的外星舰队
             self.bullets.empty()
             self._create_fleet()
 
     def _update_aliens(self):
-        """检查是否右外星人位于屏幕边缘，并更新整个外星舰队的位置"""
+        """
+        检查是否有外星人位于屏幕边缘，
+        如果有，则将整个外星舰队向下移动，并改变它们的方向
+        """
         self._check_fleet_edges()
         self.aliens.update()
 
@@ -140,7 +146,7 @@ class AlienInvasion:
             self.game_active = False
 
     def _create_fleet(self):
-        """创建一个外星舰队"""
+        """创建一个外星人舰队"""
         # 创建一个外星人，再不断的添加，直到没有空间添加外星人为止
         # 外星人的间隔为外星人的宽度和外星人的高度
         alien = Alien(self)
@@ -149,7 +155,7 @@ class AlienInvasion:
         current_x, current_y = alien_width, alien_height
         while current_y < (self.settings.screen_height - 3 * alien_height):
             while current_x < (self.settings.screen_width - 2 * alien_width):
-                self._create_alien(current_x, current_y)
+                self._create_alien(current_x, current_y)  # 创建一个外星人并将其加入外星舰队
                 current_x += 2 * alien_width
 
             # 添加一行外星人后，重置x值并递增y值
