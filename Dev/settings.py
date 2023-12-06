@@ -12,7 +12,7 @@ class Settings:
         self.ship_limit = 3
 
         # 子弹的设置
-        self.bullet_width = 300
+        self.bullet_width = 3000
         self.bullet_height = 15
         self.bullet_color = (60, 60, 60)
         self.bullets_allowed = 300
@@ -22,6 +22,8 @@ class Settings:
 
         # 以什么速度加快游戏的节奏
         self.speedup_scale = 1.1
+        # 外星人分数的提高速度
+        self.score_scale = 1.5
 
         # 初始化随游戏进行而变化的设置
         self.initialize_dynamic_settings()
@@ -43,3 +45,5 @@ class Settings:
         self.ship_speed *= self.speedup_scale
         self.bullet_speed *= self.speedup_scale
         self.alien_speed *= self.speedup_scale
+
+        self.alien_points = int(self.alien_points * self.score_scale)
